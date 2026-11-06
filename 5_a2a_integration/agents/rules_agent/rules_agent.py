@@ -4,23 +4,23 @@ from strands import Agent, tool
 from strands.multiagent.a2a import A2AServer
 from strands.hooks import AfterInvocationEvent, HookProvider, HookRegistry
 
-KB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "utils", "dnd_knowledge_base")
+KB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "utils", "rules_knowledge_base")
 _collection = None
 
 def rules_collection():
     """Open the ChromaDB collection on first use (fails loudly if the knowledge base was not built)."""
     global _collection
     if _collection is None:
-        _collection = chromadb.PersistentClient(path=KB_PATH).get_collection("dnd_basic_rules")
+        _collection = chromadb.PersistentClient(path=KB_PATH).get_collection("basic_rules")
     return _collection
 
 @tool
-def query_dnd_rules(query: str) -> str:
-    """Look up a D&D 5e rule in the Basic Rules knowledge base.
+def query_rules(query: str) -> str:
+    """Look up a rule in the Basic Rules knowledge base.
 
     Use it for any question about game mechanics: ability checks, combat,
     spellcasting, conditions, resting. Ask in plain English, as a player would.
-    The lookup is a semantic search over the D&D Basic Rules PDF: the three
+    The lookup is a semantic search over the Basic Rules PDF: the three
     passages closest to the question come back, each with its page number.
 
     Example response:

@@ -5,7 +5,7 @@ from dataclasses import dataclass, asdict
 from strands import Agent, tool
 from strands.multiagent.a2a import A2AServer
 from strands.hooks import AfterInvocationEvent, HookProvider, HookRegistry
-from tinydb import TinyDB, Query
+from tinydb import TinyDB
 
 @dataclass
 class Stats:
@@ -38,13 +38,20 @@ class Character:
         if self.created_at is None:
             self.created_at = datetime.now().isoformat()
 
+# The characters live in a local TinyDB file. The tools only go through save_character
+# and load_characters, so changing the storage means changing these two functions.
 CHARACTERS_DB = os.path.join(os.path.dirname(os.path.abspath(__file__)), "characters.json")
 characters_db = TinyDB(CHARACTERS_DB, indent=4, separators=(',', ': '))
-Character_Query = Query()
+
+def save_character(record: dict) -> None:
+    characters_db.insert(record)
+
+def load_characters() -> list[dict]:
+    return characters_db.all()
 
 @tool
 def find_character_by_name(name: str) -> dict:
-    """Find a stored D&D character by its exact name.
+    """Find a stored character by its exact name.
 
     Use it when a player refers to an existing character and you need its sheet:
     class, race, level, ability scores, inventory. Names are matched exactly and
@@ -65,7 +72,7 @@ def find_character_by_name(name: str) -> dict:
         The stored character record as a dict (see the example above).
     """
     print(f"🔍 Searching for character with name: '{name}'")
-    result = characters_db.search(Character_Query.name == name)
+    result = [character for character in load_characters() if character["name"] == name]
 
     if not result:
         # Strands turns the exception into an error result the model can see
@@ -97,7 +104,7 @@ def list_all_characters() -> list[dict]:
         A list of character records, same shape as find_character_by_name.
     """
     print("📋 Listing all characters in database")
-    all_chars = characters_db.all()
+    all_chars = load_characters()
 
     if not all_chars:
         print("📋 No characters found in database")
@@ -117,7 +124,7 @@ def create_character(
     gender: str,
     stats_dict: dict[str, int]
     ) -> dict:
-    """Create a new D&D character and save it to the database.
+    """Create a new character and save it to the database.
 
     Use it once per new character, after the ability scores have been decided
     (roll them with the 4d6-drop-lowest method first). Every new character starts
@@ -138,8 +145,8 @@ def create_character(
 
     Args:
         name: The character's name, e.g. "Thorin".
-        character_class: A D&D class such as "Fighter", "Wizard" or "Rogue".
-        race: A D&D race such as "Dwarf", "Elf" or "Human".
+        character_class: A class such as "Fighter", "Wizard" or "Rogue".
+        race: A race such as "Dwarf", "Elf" or "Human".
         gender: The character's gender, e.g. "Female"; pick one if the player did not say.
         stats_dict: Ability scores as a dict with the keys strength, dexterity,
             constitution, intelligence, wisdom and charisma, each an integer
@@ -173,7 +180,7 @@ def create_character(
         ],
     )
     record = asdict(character)
-    characters_db.insert(record)
+    save_character(record)
     print(f"✅ Created character {name} ({character_class} {race}) with id {character_id}")
     return record
 
