@@ -6,9 +6,7 @@ from mcp.server import FastMCP
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # TODO: Step 1 - Create an MCP server on port 8002
-mcp = FastMCP(
-     port=8002
-)
+mcp = FastMCP(port=8002)
 
 # TODO: Step 2 - Add the decorator to expose roll_dice as an MCP tool
 @mcp.tool()

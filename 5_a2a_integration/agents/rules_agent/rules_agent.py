@@ -1,6 +1,7 @@
 import os
 import chromadb
 from strands import Agent, tool
+from strands.models.anthropic import AnthropicModel
 from strands.multiagent.a2a import A2AServer
 from strands.hooks import AfterInvocationEvent, HookProvider, HookRegistry
 
@@ -55,14 +56,15 @@ class NewlineAfterTurn(HookProvider):
 def create_agent(context_id: str) -> Agent:
     return Agent(
         # TODO: Step 1 - Add the query_dnd_rules tool to the agent
-        tools=[query_dnd_rules],
+        model=AnthropicModel(model_id="claude-sonnet-4-6", max_tokens=4096),
+        tools=[query_rules],
         # TODO: Step 2 - Add the name "Rules Agent" to the agent
         name="Rules Agent",
         
         # TODO: Step 3 - Add the description "D&D 5e rules lookup: fast, page-referenced answers from the Basic Rules knowledge base." to the agent
         description="D&D 5e rules lookup: fast, page-referenced answers from the Basic Rules knowledge base.",
         
-        system_prompt="""You are a D&D 5e rules expert. For each rules question, call query_dnd_rules once, then answer briefly with the page reference.""",
+        system_prompt="""You are a D&D 5e rules expert. For each rules question, call query_rules once, then answer briefly with the page reference.""",
         hooks=[NewlineAfterTurn()],
     )
 
