@@ -194,7 +194,7 @@ class NewlineAfterTurn(HookProvider):
 
 def create_agent(context_id: str) -> Agent:
     return Agent(
-        model=AnthropicModel(model_id="claude-sonnet-4-6", max_tokens=4096),
+        model=AnthropicModel(model_id="claude-haiku-5-5", max_tokens=4096),
         # TODO: Step 1 - Add the create_character, find_character_by_name and list_all_characters tools to the agent
         tools=[create_character, find_character_by_name, list_all_characters],
         # TODO: Step 2 - Add the name "Character Agent" to the agent

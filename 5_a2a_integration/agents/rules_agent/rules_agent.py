@@ -56,7 +56,7 @@ class NewlineAfterTurn(HookProvider):
 def create_agent(context_id: str) -> Agent:
     return Agent(
         # TODO: Step 1 - Add the query_dnd_rules tool to the agent
-        model=AnthropicModel(model_id="claude-sonnet-4-6", max_tokens=4096),
+        model=AnthropicModel(model_id="claude-haiku-5-5", max_tokens=4096),
         tools=[query_rules],
         # TODO: Step 2 - Add the name "Rules Agent" to the agent
         name="Rules Agent",

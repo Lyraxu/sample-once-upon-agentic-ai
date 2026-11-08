@@ -8,7 +8,7 @@ mcp_dice_client = MCPClient(url="http://localhost:8002/mcp")
 
 # Use the Anthropic API directly instead of the default Amazon Bedrock model.
 # Reads the API key from the ANTHROPIC_API_KEY environment variable.
-model = AnthropicModel(model_id="claude-sonnet-4-6", max_tokens=4096)
+model = AnthropicModel(model_id="claude-haiku-5-5", max_tokens=4096)
 
 gamemaster = Agent(
     model=model,
