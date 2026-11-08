@@ -140,8 +140,8 @@ def create_character(
                        {"item_name": "Gold Pieces", "quantity": 100}]}
 
     Notes:
-        - Names are not checked for uniqueness: creating "Thorin" twice stores two
-          characters. Check with find_character_by_name if in doubt.
+        - Names must be unique and are matched exactly: creating a second "Thorin"
+          fails with an error. Use find_character_by_name to get the existing one.
         - Any ability score missing from stats_dict defaults to 10.
 
     Args:
@@ -157,6 +157,10 @@ def create_character(
         The newly created character record as a dict, including its generated
         character_id.
     """
+    if any(character["name"] == name for character in load_characters()):
+        # Strands turns the exception into an error result the model can see
+        raise ValueError(f"Character {name!r} already exists; use find_character_by_name to get it")
+
     character_id = str(uuid.uuid4())
     stats = Stats(
         strength=stats_dict.get('strength', 10),
